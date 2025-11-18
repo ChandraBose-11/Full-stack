@@ -56,7 +56,7 @@ const Login=()=> {
       localStorage.setItem("user", JSON.stringify(data));
 
       setLoading(false);
-      navigate("/"); // redirect to homepage
+      navigate("/profile"); // redirect to homepage
 
     } catch (error) {
       setLoading(false);
