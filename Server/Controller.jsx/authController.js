@@ -7,6 +7,7 @@ export const signup = async (req, res) => {
         const { first_name, last_name, email, phone, dob, password } = req.body;
         const profile_image = req.file ? `/upload/${req.file.filename}` : null;
 
+        // Validate required fields
         if (!first_name || !last_name || !email || !phone || !dob || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -122,13 +123,63 @@ export const uploadProfileImage = async (req, res) => {
         const user_id = req.user.id;
         const profile_image = req.file ? `/upload/${req.file.filename}` : null;
 
-      const [result]=await db.query("UPDATE users SET profile_image = ? WHERE id=?",[profile_image,user_id])
+        const [result] = await db.query("UPDATE users SET profile_image = ? WHERE id=?", [profile_image, user_id])
         //  console.log(result);
-       if(result.affectedRows===0){
-        return res.status(404).json({message:"User not found"})
-       }  
-       res.json({message:"Profile image uploaded",profile_image})
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        res.json({ message: "Profile image uploaded", profile_image })
     } catch (error) {
         res.status(500).json({ message: "Server Error", error: error.message })
     }
 }
+
+
+
+
+// -------------------- ⭐ NEW ADD-ON: LOGOUT --------------------
+export const logout = (req, res) => {
+    res.clearCookie("token");
+    res.json({ message: "Logged out successfully" });
+};
+
+// -------------------- ⭐ NEW ADD-ON: UPDATE PROFILE --------------------
+export const updateProfile = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const { first_name, last_name, phone, dob } = req.body;
+
+        // Validations
+        if (!first_name || !/^[A-Za-z]+$/.test(first_name)) {
+            return res.status(400).json({ message: "First name must contain only letters" });
+        }
+
+        if (!last_name || !/^[A-Za-z]+$/.test(last_name)) {
+            return res.status(400).json({ message: "Last name must contain only letters" });
+        }
+
+        if (!/^[0-9]{10}$/.test(phone)) {
+            return res.status(400).json({ message: "Phone must be 10 digits" });
+        }
+
+        if (!dob || isNaN(new Date(dob).getTime())) {
+            return res.status(400).json({ message: "Invalid date format" });
+        }
+
+        // Update DB using user_id (BEST PRACTICE)
+        const [result] = await db.query(
+            "UPDATE users SET first_name=?, last_name=?, phone=?, dob=? WHERE id=?",
+            [first_name, last_name, phone, dob, user_id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ message: "Profile updated successfully" });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
