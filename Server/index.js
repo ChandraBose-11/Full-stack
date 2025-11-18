@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import path from "path"
 import authRoutes from "./Route/authRoute.js"
 import cookieParser from "cookie-parser";
+import cors from "cors";
 dotenv.config()
 
 const filename = fileURLToPath(import.meta.url);
@@ -14,6 +15,16 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
+ 
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",   // frontend URL
+    credentials: true,                 // allow cookies to be sent
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Serve uploads directory (optional, if needed)
 app.use("/upload", express.static(path.join(dirname, "uploads")));
