@@ -24,16 +24,12 @@ export default function DashProfile() {
 
   const filePickerRef = useRef();
 
-  // ----------------------------------------------------
-  // ⭐ LOAD CURRENT USER
-  // ----------------------------------------------------
   useEffect(() => {
     const loadUser = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/auth/me`, {
           credentials: "include",
         });
-
         const data = await res.json();
 
         if (res.ok) {
@@ -57,28 +53,21 @@ export default function DashProfile() {
         console.log(error);
       }
     };
-
     loadUser();
   }, []);
 
   if (!currentUser) return <p className="text-center mt-10">Loading...</p>;
 
-  // ----------------------------------------------------
-  // ⭐ IMAGE PREVIEW + FILE SELECT
-  // ----------------------------------------------------
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
 
     if (file) {
       setPreviewImage(URL.createObjectURL(file));
-      uploadProfileImage(file); // upload immediately
+      uploadProfileImage(file);
     }
   };
 
-  // ----------------------------------------------------
-  // ⭐ UPLOAD IMAGE TO SEPARATE API
-  // ----------------------------------------------------
   const uploadProfileImage = async (file) => {
     try {
       const form = new FormData();
@@ -105,16 +94,10 @@ export default function DashProfile() {
     }
   };
 
-  // ----------------------------------------------------
-  // ⭐ HANDLE TEXT INPUT CHANGES
-  // ----------------------------------------------------
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // ----------------------------------------------------
-  // ⭐ UPDATE USER PROFILE (NO IMAGE)
-  // ----------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -122,25 +105,18 @@ export default function DashProfile() {
     setSuccessMessage(null);
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/auth/update-profile`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`http://localhost:5000/api/auth/update-profile`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json();
 
       if (res.ok) {
         setSuccessMessage("Profile updated successfully");
-
-        setCurrentUser((prev) => ({
-          ...prev,
-          ...formData,
-        }));
+        setCurrentUser((prev) => ({ ...prev, ...formData }));
       } else {
         setErrorMessage(data.message);
       }
@@ -151,9 +127,6 @@ export default function DashProfile() {
     setLoading(false);
   };
 
-  // ----------------------------------------------------
-  // ⭐ SIGN OUT
-  // ----------------------------------------------------
   const handleSignout = async () => {
     const res = await fetch(`http://localhost:5000/api/auth/logout`, {
       method: "POST",
@@ -163,93 +136,90 @@ export default function DashProfile() {
     if (res.ok) window.location.href = "/signin";
   };
 
-  // ----------------------------------------------------
-  // ⭐ DELETE USER
-  // ----------------------------------------------------
-  const handleDelete = async () => {
-    setShowModal(false);
-
-    const res = await fetch(`http://localhost:5000/api/auth/delete`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    if (res.ok) window.location.href = "/signin";
-  };
-
-  // ----------------------------------------------------
-  // ⭐ RENDER COMPONENT
-  // ----------------------------------------------------
   return (
-    <div className="max-w-lg mx-auto p-3 w-full">
-      <h1 className="text-center text-3xl font-semibold my-7">Profile</h1>
-
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        {/* IMAGE UPLOAD */}
-        <input
-          type="file"
-          accept="image/*"
-          hidden
-          ref={filePickerRef}
-          onChange={handleImageChange}
-        />
-
-        <div
-          className="w-32 h-32 rounded-full overflow-hidden shadow-md cursor-pointer mx-auto"
-          onClick={() => filePickerRef.current.click()}
-        >
-          <img
-            src={previewImage}
-            alt="Profile"
-            className="w-full h-full object-cover"
+    <div className="max-w-xl mx-auto p-10 m-20">
+      <h1 className="text-center text-3xl font-bold mb-8 text-gray-800">
+        Profile Settings
+      </h1>
+      <div className="bg-white shadow-lg rounded-xl p-8 border">
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            ref={filePickerRef}
+            onChange={handleImageChange}
           />
+
+          {/* Profile Image */}
+          <div
+            className="w-36 h-36 rounded-full overflow-hidden shadow-lg cursor-pointer mx-auto border-4 border-gray-200 hover:scale-105 transition"
+            onClick={() => filePickerRef.current.click()}
+          >
+            <img
+              src={previewImage}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Fields */}
+          <div className="grid grid-cols-2 gap-4">
+            <TextInput
+              id="first_name"
+              defaultValue={formData.first_name}
+              onChange={handleChange}
+              className="w-full"
+            />
+            <TextInput
+              id="last_name"
+              defaultValue={formData.last_name}
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+
+          <TextInput id="email" defaultValue={formData.email} disabled />
+          <TextInput
+            id="phone"
+            defaultValue={formData.phone}
+            onChange={handleChange}
+          />
+          <TextInput
+            id="dob"
+            type="date"
+            defaultValue={formData.dob}
+            onChange={handleChange}
+          />
+          <TextInput
+            id="password"
+            type="password"
+            placeholder="New Password (optional)"
+            onChange={handleChange}
+          />
+
+          <Button
+            type="submit"
+            gradientDuoTone="purpleToBlue"
+            disabled={loading}
+            className="mt-3 py-2"
+          >
+            {loading ? "Updating..." : "Update Profile"}
+          </Button>
+        </form>
+
+        {/* Delete + Logout */}
+        <div className="flex justify-between text-red-600 mt-6 font-medium">
+          <span
+            onClick={handleSignout}
+            className="cursor-pointer hover:underline"
+          >
+            Sign Out
+          </span>
         </div>
-
-        {/* INPUT FIELDS */}
-        <TextInput
-          id="first_name"
-          defaultValue={formData.first_name}
-          onChange={handleChange}
-        />
-        <TextInput
-          id="last_name"
-          defaultValue={formData.last_name}
-          onChange={handleChange}
-        />
-        <TextInput id="email" defaultValue={formData.email} disabled />
-        <TextInput
-          id="phone"
-          defaultValue={formData.phone}
-          onChange={handleChange}
-        />
-        <TextInput
-          id="dob"
-          type="date"
-          defaultValue={formData.dob}
-          onChange={handleChange}
-        />
-        <TextInput
-          id="password"
-          type="password"
-          placeholder="New Password (optional)"
-          onChange={handleChange}
-        />
-
-        <Button type="submit" gradientDuoTone="purpleToBlue" disabled={loading}>
-          {loading ? "Updating..." : "Update"}
-        </Button>
-      </form>
-
-      {/* DELETE + LOGOUT */}
-      <div className="flex justify-between text-red-500 mt-5">
-        <span onClick={() => setShowModal(true)} className="cursor-pointer">
-          Delete Account
-        </span>
-        <span onClick={handleSignout} className="cursor-pointer">
-          Sign Out
-        </span>
       </div>
 
+      {/* Alerts */}
       {successMessage && (
         <Alert color="success" className="mt-5">
           {successMessage}
@@ -260,27 +230,6 @@ export default function DashProfile() {
           {errorMessage}
         </Alert>
       )}
-
-      {/* CONFIRM DELETE MODAL */}
-      <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md">
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiOutlineExclamationCircle className="w-14 h-14 mx-auto text-gray-500 mb-4" />
-            <h3 className="text-lg mb-5">
-              Are you sure you want to delete your account?
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={handleDelete}>
-                Yes, delete
-              </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
     </div>
   );
 }

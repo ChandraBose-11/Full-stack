@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 import db from "../Database/db.js"
 import jwt from "jsonwebtoken";
 
