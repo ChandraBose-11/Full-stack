@@ -74,7 +74,7 @@ cd Server
 npm install
 ```
 
-3. Create a `.env` file in the Server directory:
+3. Create a `.env` file in the Server directory.For checking purposes only, I did not hide the `.env` file.:
 ```env
 PORT=5000
 DB_HOST=localhost
