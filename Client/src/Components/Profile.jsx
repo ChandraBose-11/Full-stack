@@ -2,7 +2,7 @@ import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
-export default function DashProfile() {
+const Profile=()=>{
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -137,8 +137,9 @@ export default function DashProfile() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-10 m-20">
-      <h1 className="text-center text-3xl font-bold mb-8 text-gray-800">
+     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center py-10 px-5 mt-5">
+    <div className="max-w-xl mx-auto p-5 m-2">
+      <h1 className="text-center text-4xl font-bold mb-8 text-gray-800">
         Profile Settings
       </h1>
       <div className="bg-white shadow-lg rounded-xl p-8 border">
@@ -231,5 +232,7 @@ export default function DashProfile() {
         </Alert>
       )}
     </div>
+    </div>
   );
 }
+export default Profile

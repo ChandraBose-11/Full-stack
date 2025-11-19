@@ -4,7 +4,7 @@ import { Button } from "flowbite-react";
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-pink-50 to-purple-50 flex flex-col items-center px-6 py-20 mt-10">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col items-center px-6 py-20 mt-10">
 
       {/* Hero Section */}
       <div className="max-w-3xl text-center mx-auto">
